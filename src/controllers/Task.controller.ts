@@ -67,7 +67,11 @@ class TaskController {
   }
 
   public async delete (req: Request, res: Response) {
-    const { id } = req.params
+    const deleteTaskParamsSchema = z.object({
+      id: z.string().uuid()
+    })
+    const { id } = deleteTaskParamsSchema.parse(req.params)
+
     const deleteTask = new DeleteTaskService().execute
     await deleteTask(id)
     res.status(200).send()
