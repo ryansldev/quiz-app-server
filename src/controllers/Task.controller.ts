@@ -43,10 +43,26 @@ class TaskController {
   }
 
   public async update (req: Request, res: Response) {
-    const { id } = req.params
-    const data = req.body
+    const updateTaskParamsSchema = z.object({
+      id: z.string().uuid()
+    })
+
+    const { id } = updateTaskParamsSchema.parse(req.params)
+
+    const updateTaskBodySchema = z.object({
+      title: z.string().optional(),
+      description: z.string().optional(),
+      done: z.boolean(),
+      deadline: z.string().date().optional()
+    })
+    const { title, description, done, deadline } = updateTaskBodySchema.parse(req.body)
     const updateTask = new UpdateTaskService().execute
-    await updateTask(id, data)
+    await updateTask(id, {
+      title,
+      description,
+      done,
+      deadline: deadline ? new Date(deadline) : undefined
+    })
     res.status(200).send()
   }
 
