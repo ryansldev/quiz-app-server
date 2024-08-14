@@ -24,6 +24,9 @@ class TaskController {
       done,
       deadline: deadline ? new Date(deadline) : undefined
     })
+
+    req.io.emit('taskCreated', task)
+
     res.status(200).json(task)
   }
 
