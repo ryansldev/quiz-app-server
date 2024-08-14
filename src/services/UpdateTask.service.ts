@@ -4,6 +4,7 @@ type DataType = {
   title?: string;
   description?: string;
   done?: boolean;
+  deadline?: Date;
 }
 
 class UpdateTaskService {

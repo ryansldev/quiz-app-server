@@ -11,8 +11,11 @@ datasource db {
 }
 
 model Task {
-  id          String  @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
-  description String
+  description String?
   done        Boolean
+  deadline    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

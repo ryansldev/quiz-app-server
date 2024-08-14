@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import type { Request, Response } from 'express'
 import { CreateTaskService } from '~services/CreateTask.service'
 import { DeleteTaskService } from '~services/DeleteTask.service'
@@ -7,14 +8,26 @@ import { UpdateTaskService } from '~services/UpdateTask.service'
 
 class TaskController {
   public async create (req: Request, res: Response) {
-    const { title, description, done } = req.body
+    const createTaskBodySchema = z.object({
+      title: z.string(),
+      description: z.string().optional(),
+      done: z.boolean().default(false),
+      deadline: z.string().date().optional()
+    })
+
+    const { title, description, done, deadline } = createTaskBodySchema.parse(req.body)
     const createTask = new CreateTaskService().execute
 
-    const task = await createTask(title, description, done)
+    const task = await createTask({
+      title,
+      description,
+      done,
+      deadline: deadline ? new Date(deadline) : undefined
+    })
     res.status(200).json(task)
   }
 
-  public async list (req: Request, res: Response) {
+  public async list (_req: Request, res: Response) {
     const listTasks = new ListTasksService().execute
 
     const tasks = await listTasks()
