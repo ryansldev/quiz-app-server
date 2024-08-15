@@ -55,17 +55,20 @@ class TaskController {
     const updateTaskBodySchema = z.object({
       title: z.string().optional(),
       description: z.string().optional(),
-      done: z.boolean(),
+      done: z.boolean().optional(),
       deadline: z.string().date().optional()
     })
     const { title, description, done, deadline } = updateTaskBodySchema.parse(req.body)
     const updateTask = new UpdateTaskService().execute
-    await updateTask(id, {
+    const newTask = await updateTask(id, {
       title,
       description,
       done,
       deadline: deadline ? new Date(deadline) : undefined
     })
+
+    req.io.emit('taskEdited', newTask)
+
     res.status(200).send()
   }
 
@@ -77,6 +80,9 @@ class TaskController {
 
     const deleteTask = new DeleteTaskService().execute
     await deleteTask(id)
+
+    req.io.emit('taskDeleted', id)
+
     res.status(200).send()
   }
 }
