@@ -56,18 +56,22 @@ class TaskController {
       title: z.string().optional(),
       description: z.string().optional(),
       done: z.boolean().optional(),
-      deadline: z.string().date().optional()
+      deadline: z.string().optional().transform((str) => str && new Date(str))
     })
     const { title, description, done, deadline } = updateTaskBodySchema.parse(req.body)
     const updateTask = new UpdateTaskService().execute
-    const newTask = await updateTask(id, {
+    await updateTask(id, {
       title,
       description,
       done,
       deadline: deadline ? new Date(deadline) : undefined
     })
 
-    req.io.emit('taskEdited', newTask)
+    const listTasks = new ListTasksService().execute
+
+    const newTaskList = await listTasks()
+
+    req.io.emit('taskEdited', newTaskList)
 
     res.status(200).send()
   }
